@@ -7,19 +7,25 @@ Javascript Frameworks (GSAP)
 
 # Design Properties
 Professional font and styles
+background with the stage red curtains opened.
 
 # Layout
-## Scene 1
-An animized teenager looking girl on the left hand side of the screen. On the upper left corner, it should say, “Click on either flute or piccolo.” On the upper right hand side of the screen, there should be a Flute floating in the air just with the word: “flute” under it. And on the bottom right hand side, there should be a piccolo floating in the air as well just with the word: “piccolo”.
-
-## Scene 2
-There should be a girl getting ready to play the flute, but since she is only getting ready, she should be holding the flute and it should not be anywhere near her lips. She is not playing, yet. 
-
-## Scene 3
-When the viewer scrolls down from scene 2, the image has to zoom in more into the girl with the first key on the flute glowing in yellow, so that the viewer can click on it and go to the next screen.
-
-## Scene 4
-When the viewer clicks on the key it should bring them to a page with the video. The video will look like this: there will be a screen with the play button on the bottom.
-
-## Scene 5
-After the viewer watches the video, they will scroll down more then the flute will come up, so that by the time there are the descriptions, there is a flute above it with the second key glowing in yellow. Below, there will be two pictures of the girl playing the flute on the left side and there will be a description on the right side. 
+# Screen 1
+- Make an Animized teenager looking female character on the left hand side of the screen.
+-This girl will be on a stage
+- The girl should be wearing a formal stage dress.
+- Create a button "Click on either flute or piccolo" on the upper left corner.
+- Make & Locate a Flute on the upper right hand side with the description "flute".
+- Make & Locate a piccolo on the bottom right hand side.
+- Seamless Animation 1: User should be able to see an animation that the character is getting ready to play the flute Upon scrolling down. Add gradual zoom effect to the chracter.
+# Screen 2
+ - After the chracter's ready to play the flute, zoom-in stops, and the first key of the flute should be glowing in yellow. 
+ - When the flute rises as the screen zooms in, the character has to end up with the flute on her lips, not just holding.
+ -there shouldn't be a scrolling feature between the ready to play flute screen and the video screen. I only want it to be changing screens when the yellow button is clicked. 
+ # Screen 3
+- Clicking the key transition the screen to the video section - it shouldn't appear to be 'different section', but rather, a pop-up.
+- Seamless animation 1: After the viewer watches the video, they will scroll down more 
+- Seamless animation 2: After they scroll down, the flute will come up, so that by the time there are descriptions, there is a flute above it.
+- The flute's second key would be glowing in yellow
+- For the Descriptions part, there will be two pictures of the girl playing the flute on the left side.
+- On the right side, there will be a description.

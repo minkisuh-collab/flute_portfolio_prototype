@@ -1,169 +1,202 @@
 /* ============================================================
    Minki — Flutist Portfolio
-   GSAP-driven scene logic
+   GSAP scene logic
    ============================================================ */
 
 gsap.registerPlugin(ScrollTrigger);
 
-/* ---------- Inject SVG templates into their hosts ---------- */
+/* ---------- Inject SVG templates ---------- */
 function cloneTemplate(name) {
   const tpl = document.querySelector(`#svg-templates [data-tpl="${name}"]`);
   return tpl ? tpl.cloneNode(true) : null;
 }
 
 document.querySelectorAll("[data-girl]").forEach((host) => {
-  const kind = host.dataset.girl; // standing | playing
-  const svg = cloneTemplate(kind === "playing" ? "girl-playing" : "girl-standing");
+  const svg = cloneTemplate(host.dataset.girl === "playing" ? "girl-playing" : "girl-standing");
   if (svg) { svg.classList.remove("tpl"); host.appendChild(svg); }
 });
 
 document.querySelectorAll("[data-instr]").forEach((host) => {
-  const svg = cloneTemplate(host.dataset.instr); // flute | piccolo
-  if (svg) {
-    svg.classList.remove("tpl");
-    host.appendChild(svg);
-    // pre-glow a specific key (used in Scene 5)
-    const gk = host.dataset.glowKey;
-    if (gk) {
-      const key = svg.querySelector(`.fkey[data-key="${gk}"]`);
-      if (key) key.classList.add("fkey--glow");
-    }
+  const svg = cloneTemplate(host.dataset.instr);
+  if (!svg) return;
+  svg.classList.remove("tpl");
+  host.appendChild(svg);
+  const gk = host.dataset.glowKey;        // pre-glow a key (Screen 3 flute)
+  if (gk) {
+    const key = svg.querySelector(`.fkey[data-key="${gk}"]`);
+    if (key) key.classList.add("fkey--glow");
   }
 });
 
-/* ============================================================
-   Scene rail — active dot follows scroll
-   ============================================================ */
-const railDots = gsap.utils.toArray(".rail-dot");
-["#scene1", "#scene2", "#scene4", "#scene5"].forEach((sel, i) => {
-  // scene2 section visually contains scene 2 & 3, so we light dots 2 & 3 across it
-  ScrollTrigger.create({
-    trigger: sel,
-    start: "top center",
-    end: "bottom center",
-    onToggle: (self) => {
-      if (!self.isActive) return;
-      railDots.forEach((d) => d.classList.remove("is-active"));
-      const sceneNum = sel === "#scene2" ? 2 : sel === "#scene4" ? 4 : sel === "#scene5" ? 5 : 1;
-      const dot = document.querySelector(`.rail-dot[data-scene="${sceneNum}"]`);
-      if (dot) dot.classList.add("is-active");
-    },
-  });
-});
+/* ---------- Element refs ---------- */
+const stageScaler = document.getElementById("stageScaler");
+const standingLayer = stageScaler.querySelector(".girl-layer--standing");
+const playingLayer = stageScaler.querySelector(".girl-layer--playing");
+const heldFlute = playingLayer.querySelector("[data-held-flute]");
+const firstKey = playingLayer.querySelector('.fkey[data-key="1"]');
+const floaters = document.getElementById("floaters");
+const ctaPick = document.getElementById("ctaPick");
+const capScroll = document.getElementById("capScroll");
+const capKey = document.getElementById("capKey");
+const stageCue = document.getElementById("stageScrollCue");
+const descSection = document.getElementById("descriptions");
+
+const railDot = (n) => document.querySelector(`.rail-dot[data-scene="${n}"]`);
+function setRail(n) {
+  document.querySelectorAll(".rail-dot").forEach((d) => d.classList.remove("is-active"));
+  const dot = railDot(n);
+  if (dot) dot.classList.add("is-active");
+}
+
+let descRevealed = false;
 
 /* ============================================================
-   SCENE 1 — entrance + click to advance
+   Intro entrance
    ============================================================ */
-const introTl = gsap.timeline({ defaults: { ease: "power3.out" } });
-introTl
-  .from(".scene-1__girl", { x: -80, opacity: 0, duration: 1.1 })
-  .from(".hint--topleft", { y: -20, opacity: 0, duration: 0.8 }, "-=0.7")
-  .from(".instrument--flute", { x: 80, opacity: 0, duration: 0.9 }, "-=0.6")
+gsap.timeline({ defaults: { ease: "power3.out" } })
+  .from(".stage-scaler", { x: -70, opacity: 0, duration: 1.1 })
+  .from(".cta-pick", { y: -20, opacity: 0, duration: 0.7 }, "-=0.7")
+  .from(".instrument--flute", { x: 80, opacity: 0, duration: 0.9 }, "-=0.5")
   .from(".instrument--piccolo", { x: 80, opacity: 0, duration: 0.9 }, "-=0.6")
-  .from(".scroll-cue--center", { opacity: 0, duration: 0.6 }, "-=0.3");
+  .from(".scroll-cue--stage", { opacity: 0, duration: 0.6 }, "-=0.3");
 
-// gentle float on the instruments
 gsap.to(".instrument--flute .instr-art", { y: 14, duration: 3, ease: "sine.inOut", repeat: -1, yoyo: true });
 gsap.to(".instrument--piccolo .instr-art", { y: -12, duration: 3.4, ease: "sine.inOut", repeat: -1, yoyo: true });
 
-function goTo(selector) {
-  const el = document.querySelector(selector);
-  if (el) el.scrollIntoView({ behavior: "smooth" });
-}
-
-document.getElementById("pickFlute").addEventListener("click", () => goTo("#scene2"));
-document.getElementById("pickPiccolo").addEventListener("click", () => {
-  // Prototype focuses on the flute journey; nudge the user toward it.
-  const piccolo = document.querySelector(".instrument--piccolo .instr-art");
-  gsap.fromTo(piccolo, { rotation: -3 }, { rotation: 3, duration: 0.1, repeat: 5, yoyo: true, transformOrigin: "center", onComplete: () => goTo("#scene2") });
-});
-
 /* ============================================================
-   SCENE 2 + 3 — pinned zoom-in; reveal glowing first key
+   SCREEN 1 -> 2  (pinned, scroll-zoom into "ready")
+   Scrolling cannot pass this section because #descriptions is
+   hidden until the video pop-up has been opened.
    ============================================================ */
-const stageScaler = document.getElementById("stageScaler");
-const heldFlute = stageScaler.querySelector("[data-held-flute]");
-const firstKey = stageScaler.querySelector('.fkey[data-key="1"]');
-const capReady = document.getElementById("cap-getready");
-const capKey = document.getElementById("cap-firstkey");
-const stageCue = document.getElementById("stageScrollCue");
+gsap.set(playingLayer, { opacity: 0 });
+gsap.set(heldFlute, { rotation: -32, svgOrigin: "180 230" }); // start: flute lowered
 
 const stageTl = gsap.timeline({
   scrollTrigger: {
-    trigger: "#scene2",
+    trigger: "#stage",
     start: "top top",
-    end: "+=160%",
+    end: "+=175%",
     scrub: 1,
     pin: true,
+    onUpdate: (self) => {
+      const glowing = self.progress >= 0.9;
+      firstKey.classList.toggle("fkey--glow", glowing);
+      capKey.style.opacity = glowing ? 1 : 0;
+      if (stageCue) stageCue.style.opacity = glowing ? 0 : 1;
+    },
   },
 });
 
 stageTl
-  // Phase A: lift the flute up toward her lips (getting ready -> closer)
-  .to(heldFlute, { y: -58, rotation: -4, transformOrigin: "70% 50%", ease: "none" }, 0)
-  // Phase B: zoom in toward hands / first key
-  .to(stageScaler, { scale: 1.9, ease: "none" }, 0)
-  .to(capReady, { opacity: 0, duration: 0.2 }, 0.35)
-  // Phase C: reveal + glow the first key, swap caption
-  .add(() => {
-    firstKey.classList.add("fkey--glow");
-    capKey.style.opacity = 1;
-    if (stageCue) stageCue.style.opacity = 0;
-  }, 0.55)
-  .add(() => {
-    // reverse handling: hide glow if user scrolls back up
-    if (stageTl.scrollTrigger.progress < 0.55) {
-      firstKey.classList.remove("fkey--glow");
-      capKey.style.opacity = 0;
-      capReady.style.opacity = 1;
-      if (stageCue) stageCue.style.opacity = 1;
-    }
-  }, 0.54);
+  .to(ctaPick, { opacity: 0, duration: 0.12 }, 0)
+  .to(floaters, { opacity: 0, duration: 0.16 }, 0)
+  .to(capScroll, { opacity: 0, duration: 0.15 }, 0.18)
+  .to(standingLayer, { opacity: 0, duration: 0.18 }, 0.06)
+  .to(playingLayer, { opacity: 1, duration: 0.18 }, 0.06)
+  // raise the flute to her lips
+  .to(heldFlute, { rotation: 0, ease: "none", duration: 0.7 }, 0.12)
+  // gradual zoom toward her face/lips, then hold
+  .to(stageScaler, { scale: 1.85, ease: "none", duration: 0.85 }, 0)
+  .to({}, { duration: 0.15 }); // tail so the "ready" state holds at the end
 
-// Clicking the glowing first key -> Scene 4 (video)
-firstKey.addEventListener("click", () => {
-  if (!firstKey.classList.contains("fkey--glow")) return;
-  goTo("#scene4");
-});
+/* ---------- glowing key -> open video pop-up ---------- */
 firstKey.style.cursor = "pointer";
+firstKey.setAttribute("role", "button");
+firstKey.addEventListener("click", () => {
+  if (firstKey.classList.contains("fkey--glow")) openModal();
+});
 
 /* ============================================================
-   SCENE 4 — play button (placeholder toggle)
+   VIDEO MODAL (pop-up)
    ============================================================ */
+const modal = document.getElementById("videoModal");
 const playBtn = document.getElementById("playBtn");
+
+function openModal() {
+  modal.classList.add("is-open");
+  modal.setAttribute("aria-hidden", "false");
+  document.body.style.overflow = "hidden";
+  setRail(2);
+}
+function closeModal() {
+  modal.classList.remove("is-open");
+  modal.setAttribute("aria-hidden", "true");
+  document.body.style.overflow = "";
+  revealDescriptions();
+}
+
+document.getElementById("modalClose").addEventListener("click", closeModal);
+document.getElementById("modalBackdrop").addEventListener("click", closeModal);
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && modal.classList.contains("is-open")) closeModal();
+});
+
 playBtn.addEventListener("click", () => {
   playBtn.classList.toggle("is-playing");
-  const poster = document.querySelector(".video-poster");
-  gsap.to(poster, { opacity: playBtn.classList.contains("is-playing") ? 0.35 : 1, duration: 0.5 });
-});
-
-gsap.from("#scene4 .video-wrap", {
-  scrollTrigger: { trigger: "#scene4", start: "top 65%" },
-  y: 50, opacity: 0, duration: 1, ease: "power3.out",
+  const poster = modal.querySelector(".video-poster");
+  gsap.to(poster, { opacity: playBtn.classList.contains("is-playing") ? 0.3 : 1, duration: 0.5 });
 });
 
 /* ============================================================
-   SCENE 5 — flute rises in, second key already glowing; content reveals
+   SCREEN 3 — DESCRIPTIONS (revealed only after the video pop-up)
    ============================================================ */
-gsap.from("#descFlute", {
-  scrollTrigger: { trigger: "#scene5", start: "top 75%", end: "top 30%", scrub: 1 },
-  y: 160, opacity: 0, ease: "none",
+function revealDescriptions() {
+  if (descRevealed) return;
+  descRevealed = true;
+  descSection.hidden = false;
+  ScrollTrigger.refresh();
+
+  // flute rises up as the descriptions come into view
+  gsap.from("#descFlute", {
+    scrollTrigger: { trigger: "#descriptions", start: "top 78%", end: "top 28%", scrub: 1 },
+    y: 170, opacity: 0, ease: "none",
+  });
+  gsap.from("#descriptions .desc-head", {
+    scrollTrigger: { trigger: "#descriptions .desc-head", start: "top 82%" },
+    y: 40, opacity: 0, duration: 0.9, ease: "power3.out",
+  });
+  gsap.from("#descriptions .photo", {
+    scrollTrigger: { trigger: "#descriptions .desc-grid", start: "top 80%" },
+    y: 50, opacity: 0, duration: 0.9, stagger: 0.18, ease: "power3.out",
+  });
+  gsap.from("#descriptions .desc-text p", {
+    scrollTrigger: { trigger: "#descriptions .desc-grid", start: "top 72%" },
+    y: 30, opacity: 0, duration: 0.8, stagger: 0.15, ease: "power2.out",
+  });
+
+  ScrollTrigger.create({
+    trigger: "#descriptions",
+    start: "top center",
+    end: "bottom center",
+    onToggle: (self) => { if (self.isActive) setRail(3); },
+  });
+
+  // gentle nudge so the new section is noticed
+  gsap.delayedCall(0.25, () => window.scrollBy({ top: window.innerHeight * 0.5, behavior: "smooth" }));
+}
+
+/* ============================================================
+   Navigation buttons (Screen 1)
+   ============================================================ */
+function scrollThroughZoom() {
+  const st = stageTl.scrollTrigger;
+  const target = st.start + (st.end - st.start) * 0.96;
+  window.scrollTo({ top: target, behavior: "smooth" });
+}
+ctaPick.addEventListener("click", scrollThroughZoom);
+document.getElementById("pickFlute").addEventListener("click", scrollThroughZoom);
+document.getElementById("pickPiccolo").addEventListener("click", () => {
+  const piccolo = document.querySelector(".instrument--piccolo .instr-art");
+  gsap.fromTo(piccolo, { rotation: -3 }, {
+    rotation: 3, duration: 0.1, repeat: 5, yoyo: true, transformOrigin: "center",
+    onComplete: scrollThroughZoom,
+  });
 });
 
-gsap.from("#scene5 .desc-head", {
-  scrollTrigger: { trigger: "#scene5 .desc-head", start: "top 80%" },
-  y: 40, opacity: 0, duration: 0.9, ease: "power3.out",
+/* rail: stage active by default */
+ScrollTrigger.create({
+  trigger: "#stage", start: "top center", end: "bottom center",
+  onToggle: (self) => { if (self.isActive && !modal.classList.contains("is-open")) setRail(1); },
 });
 
-gsap.from("#scene5 .photo", {
-  scrollTrigger: { trigger: "#scene5 .desc-grid", start: "top 78%" },
-  y: 50, opacity: 0, duration: 0.9, stagger: 0.18, ease: "power3.out",
-});
-
-gsap.from("#scene5 .desc-text p", {
-  scrollTrigger: { trigger: "#scene5 .desc-grid", start: "top 70%" },
-  y: 30, opacity: 0, duration: 0.8, stagger: 0.15, ease: "power2.out",
-});
-
-/* Refresh ScrollTrigger once fonts/images settle */
 window.addEventListener("load", () => ScrollTrigger.refresh());
