@@ -13,6 +13,7 @@ background with the stage red curtains opened.
 # Screen 1
 - Make an Animized teenager looking female character on the left hand side of the screen.
 -This girl will be on a stage
+-When the screen starts, I want the curtain to be opening before it shows the girl.
 - The girl should be wearing a formal stage dress.
 - Create a button "Click on either flute or piccolo" on the upper left corner.
 - Make & Locate a Flute on the upper right hand side with the description "flute".
@@ -23,9 +24,14 @@ background with the stage red curtains opened.
  - When the flute rises as the screen zooms in, the character has to end up with the flute on her lips, not just holding.
  -there shouldn't be a scrolling feature between the ready to play flute screen and the video screen. I only want it to be changing screens when the yellow button is clicked. 
  # Screen 3
-- Clicking the key transition the screen to the video section - it shouldn't appear to be 'different section', but rather, a pop-up.
+- Clicking the key transition the screen to the video section - it shouldn't appear to be 'different section', but rather, a pop-up. 
+- This section will be named prelude.
 - Seamless animation 1: After the viewer watches the video, they will scroll down more 
 - Seamless animation 2: After they scroll down, the flute will come up, so that by the time there are descriptions, there is a flute above it.
 - The flute's second key would be glowing in yellow
 - For the Descriptions part, there will be two pictures of the girl playing the flute on the left side.
 - On the right side, there will be a description.
+-This section will be named interlude.
+
+# Screen 4
+- After Screen 3, the user will scroll don even more with a page saying the achievements that Minki has made throughout her journey. That page should say postlude.

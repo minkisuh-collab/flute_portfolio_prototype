@@ -40,6 +40,7 @@ const capScroll = document.getElementById("capScroll");
 const capKey = document.getElementById("capKey");
 const stageCue = document.getElementById("stageScrollCue");
 const descSection = document.getElementById("descriptions");
+const postSection = document.getElementById("postlude");
 
 const railDot = (n) => document.querySelector(`.rail-dot[data-scene="${n}"]`);
 function setRail(n) {
@@ -51,14 +52,22 @@ function setRail(n) {
 let descRevealed = false;
 
 /* ============================================================
-   Intro entrance
+   Intro — curtains open first, THEN the stage is revealed
    ============================================================ */
+gsap.set([".stage-scaler", ".cta-pick", ".instrument--flute", ".instrument--piccolo", ".scroll-cue--stage"], { opacity: 0 });
+
 gsap.timeline({ defaults: { ease: "power3.out" } })
-  .from(".stage-scaler", { x: -70, opacity: 0, duration: 1.1 })
-  .from(".cta-pick", { y: -20, opacity: 0, duration: 0.7 }, "-=0.7")
-  .from(".instrument--flute", { x: 80, opacity: 0, duration: 0.9 }, "-=0.5")
-  .from(".instrument--piccolo", { x: 80, opacity: 0, duration: 0.9 }, "-=0.6")
-  .from(".scroll-cue--stage", { opacity: 0, duration: 0.6 }, "-=0.3");
+  // open the curtains
+  .to("#ciLeft",  { xPercent: -100, duration: 1.5, ease: "power3.inOut" }, 0.35)
+  .to("#ciRight", { xPercent: 100,  duration: 1.5, ease: "power3.inOut" }, 0.35)
+  .add("reveal")
+  .set("#curtainIntro", { display: "none" })
+  // reveal the performer + Screen 1 elements
+  .fromTo(".stage-scaler", { x: -70, opacity: 0 }, { x: 0, opacity: 1, duration: 1.05 }, "reveal-=0.35")
+  .fromTo(".cta-pick", { y: -20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7 }, "reveal+=0.1")
+  .fromTo(".instrument--flute", { x: 80, opacity: 0 }, { x: 0, opacity: 1, duration: 0.9 }, "<")
+  .fromTo(".instrument--piccolo", { x: 80, opacity: 0 }, { x: 0, opacity: 1, duration: 0.9 }, "<+0.12")
+  .fromTo(".scroll-cue--stage", { opacity: 0 }, { opacity: 1, duration: 0.6 }, "<");
 
 gsap.to(".instrument--flute .instr-art", { y: 14, duration: 3, ease: "sine.inOut", repeat: -1, yoyo: true });
 gsap.to(".instrument--piccolo .instr-art", { y: -12, duration: 3.4, ease: "sine.inOut", repeat: -1, yoyo: true });
@@ -144,6 +153,7 @@ function revealDescriptions() {
   if (descRevealed) return;
   descRevealed = true;
   descSection.hidden = false;
+  postSection.hidden = false;
   ScrollTrigger.refresh();
 
   // flute rises up as the descriptions come into view
@@ -169,6 +179,26 @@ function revealDescriptions() {
     start: "top center",
     end: "bottom center",
     onToggle: (self) => { if (self.isActive) setRail(3); },
+  });
+
+  // ----- Screen 4: Postlude (achievements) -----
+  gsap.from("#postlude .post-head", {
+    scrollTrigger: { trigger: "#postlude", start: "top 78%" },
+    y: 40, opacity: 0, duration: 0.9, ease: "power3.out",
+  });
+  gsap.from("#postlude .tl-item", {
+    scrollTrigger: { trigger: "#postlude .timeline", start: "top 82%" },
+    x: -40, opacity: 0, duration: 0.8, stagger: 0.16, ease: "power3.out",
+  });
+  gsap.from("#postlude .post-close", {
+    scrollTrigger: { trigger: "#postlude .post-close", start: "top 90%" },
+    opacity: 0, y: 20, duration: 0.9, ease: "power2.out",
+  });
+  ScrollTrigger.create({
+    trigger: "#postlude",
+    start: "top center",
+    end: "bottom center",
+    onToggle: (self) => { if (self.isActive) setRail(4); },
   });
 
   // gentle nudge so the new section is noticed

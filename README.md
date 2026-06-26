@@ -18,10 +18,12 @@ Then open <http://localhost:5173> in a browser.
 
 The whole piece sits on a fixed **theatrical backdrop**: opened red stage curtains, a valance, and a wooden stage floor.
 
+0. **Curtain opening** — on load, closed red curtains slide open to reveal the stage.
 1. **Screen 1 — Stage** — the girl (formal gown) stands on the left, a floating flute and piccolo sit on the right, and a button reads *"Click on either flute or piccolo."* Scrolling (or clicking the button/flute) triggers a **gradual zoom** as she gets ready to play.
 2. **Screen 2 — Ready** — the zoom stops with the **flute on her lips** and the **first key glowing gold**. Scrolling does **not** advance here — you must **click the glowing key**.
-3. **Video pop-up** — clicking the key opens the performance video as a **modal** (16:9 frame + play button). Close it to continue.
-4. **Screen 3 — Descriptions** — after the video, scrolling down raises a large flute (with the **second key glowing**) above two photos (left) and the written description (right).
+3. **Prelude (video pop-up)** — clicking the key opens the performance video as a **modal** (16:9 frame + play button). Close it to continue.
+4. **Interlude (descriptions)** — after the video, scrolling down raises a large flute (with the **second key glowing**) above two photos (left) and the written description (right).
+5. **Postlude (achievements)** — scrolling further reveals a gold timeline of Minki's milestones.
 
 ## Swapping in real content
 

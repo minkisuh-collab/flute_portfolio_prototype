@@ -26,11 +26,18 @@
     </div>
   </div>
 
+  <!-- ===== Intro curtains: closed at load, then open to reveal the stage ===== -->
+  <div class="curtain-intro" id="curtainIntro" aria-hidden="true">
+    <div class="ci-panel ci-panel--left" id="ciLeft"></div>
+    <div class="ci-panel ci-panel--right" id="ciRight"></div>
+  </div>
+
   <!-- Right-side progress dots -->
   <nav class="scene-rail" aria-label="Section navigation">
     <span class="rail-dot is-active" data-scene="1"></span>
     <span class="rail-dot" data-scene="2"></span>
     <span class="rail-dot" data-scene="3"></span>
+    <span class="rail-dot" data-scene="4"></span>
   </nav>
 
   <!-- ============ SCREEN 1 + 2 — STAGE (pinned, scroll-zoom into "ready", key glows) ============ -->
@@ -76,7 +83,7 @@
 
     <div class="desc-content">
       <header class="desc-head">
-        <span class="kicker">Second Movement</span>
+        <span class="kicker">Interlude</span>
         <h2 class="desc-title">A Voice That Grew With Me</h2>
       </header>
 
@@ -94,12 +101,63 @@
     </div>
   </section>
 
+  <!-- ============ SCREEN 4 — POSTLUDE (achievements) ============ -->
+  <section class="scene scene-post" id="postlude" hidden>
+    <div class="post-content">
+      <header class="post-head">
+        <span class="kicker">Postlude</span>
+        <h2 class="post-title">A Journey in Achievements</h2>
+        <p class="post-sub">Milestones earned along the way &mdash; one breath, one stage at a time.</p>
+      </header>
+
+      <ol class="timeline">
+        <li class="tl-item">
+          <span class="tl-year">2019</span>
+          <div class="tl-body">
+            <h3>First Recital</h3>
+            <p>Performed my first solo at the school spring concert after two years of study.</p>
+          </div>
+        </li>
+        <li class="tl-item">
+          <span class="tl-year">2021</span>
+          <div class="tl-body">
+            <h3>Regional Youth Orchestra</h3>
+            <p>Accepted as a flutist in the regional youth orchestra, my first ensemble seat.</p>
+          </div>
+        </li>
+        <li class="tl-item">
+          <span class="tl-year">2023</span>
+          <div class="tl-body">
+            <h3>Gold &mdash; National Flute Competition</h3>
+            <p>First place in the junior division, judged on tone, technique, and musicality.</p>
+          </div>
+        </li>
+        <li class="tl-item">
+          <span class="tl-year">2024</span>
+          <div class="tl-body">
+            <h3>Principal Flute</h3>
+            <p>Named principal flute of the City Youth Symphony and featured as a gala soloist.</p>
+          </div>
+        </li>
+        <li class="tl-item">
+          <span class="tl-year">2025</span>
+          <div class="tl-body">
+            <h3>Masterclass Scholar</h3>
+            <p>Selected for a summer conservatory masterclass studying repertoire and chamber music.</p>
+          </div>
+        </li>
+      </ol>
+
+      <p class="post-close">Thank you for listening to my story.</p>
+    </div>
+  </section>
+
   <!-- ============ VIDEO POP-UP (modal) ============ -->
   <div class="modal" id="videoModal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Performance video">
     <div class="modal__backdrop" id="modalBackdrop"></div>
     <div class="modal__panel">
       <button class="modal__close" id="modalClose" aria-label="Close video">&times;</button>
-      <span class="kicker">Performance</span>
+      <span class="kicker">Prelude</span>
       <h3 class="modal__title">Watch Minki Play</h3>
       <div class="video-frame" id="videoFrame">
         <div class="video-poster"></div>
